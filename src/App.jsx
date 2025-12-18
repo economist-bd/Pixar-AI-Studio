@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Download, Sparkles, Image as ImageIcon, Loader2, AlertCircle, Clock, Upload, X, Settings } from 'lucide-react';
+import { Camera, Download, Sparkles, Image as ImageIcon, Loader2, AlertCircle, Clock, Upload, X, Settings, Palette } from 'lucide-react';
 
 export default function App() {
   const [userPrompt, setUserPrompt] = useState('');
@@ -10,12 +10,51 @@ export default function App() {
   // Settings
   const [aspectRatio, setAspectRatio] = useState('9:16');
   const [referenceImage, setReferenceImage] = useState(null); 
-  
-  // API Key state - Updated to check Environment Variable
+  const [selectedStyle, setSelectedStyle] = useState('Pixar'); // New Style State
+
+  // API Key state
   const [customKey, setCustomKey] = useState(''); 
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const fileInputRef = useRef(null);
+
+  // Style Definitions
+  const styles = {
+    'Pixar': {
+      label: 'Pixar 3D',
+      desc: 'ডিজনি পিক্সার স্টাইল',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Disney Pixar / Dreamworks animation.
+      - Render: Unreal Engine 5, Octane Render, 8k resolution.
+      - Lighting: Cinematic, soft shadows, volumetric lighting.
+      - Colors: Vibrant, warm, rich textures.
+      - Skin/Surface: Smooth animated texture, expressive features.
+      `
+    },
+    'Lo-Fi': {
+      label: 'Lo-Fi Chill',
+      desc: 'রিলাক্সিং অ্যানিমে স্টাইল',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Lo-fi aesthetic, 90s anime style, Studio Ghibli inspired.
+      - Vibe: Relaxing, nostalgic, calm, study beats background.
+      - Colors: Muted pastels, soft purple/pink/blue tones, slightly grainy, retro filter.
+      - Render: 2D flat shading or cel-shaded, hand-drawn feel.
+      `
+    },
+    'Cozy': {
+      label: 'Cozy Warm',
+      desc: 'উষ্ণ এবং আরামদায়ক',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Cozy illustration, Hygge atmosphere, warm and inviting.
+      - Lighting: Warm golden hour, fairy lights, soft candle glow, fireplace warmth.
+      - Textures: Soft fabrics (knitted), wood, plants, detailed comfortable environment.
+      - Render: High quality 3D render or detailed digital painting, soft focus.
+      `
+    }
+  };
 
   // Countdown timer
   useEffect(() => {
@@ -65,31 +104,29 @@ export default function App() {
     const compositionRules = `
       FRAMING & COMPOSITION RULES (STRICT):
       - Aspect Ratio: ${aspectRatio}.
-      - Default Shot: FULL BODY shot showing the character from head to toe.
+      - Default Shot: FULL BODY shot showing the character/scene fully.
       - If "Close Up" or "Portrait" is requested in prompt:
         * For HUMANS: Generate a HALF BODY shot (Waist up).
         * For ANIMALS/OBJECTS: Maintain FULL BODY shot but fill the frame.
     `;
 
+    // Dynamic Prompt Construction based on selected style
     const finalPrompt = `
-      Create a high-quality 3D animated Disney Pixar style image.
+      Create a high-quality image based on the user description.
+      
       User Scene Description: ${userPrompt}
+      
       ${compositionRules}
-      MANDATORY ART STYLE:
-      - Style: Disney Pixar / Dreamworks animation.
-      - Render: Unreal Engine 5, Octane Render, 8k resolution.
-      - Lighting: Cinematic, soft shadows, volumetric lighting.
-      - Colors: Vibrant, warm, rich textures.
+      
+      ${styles[selectedStyle].instruction}
     `;
 
     try {
-      // Priority: 1. User Input Key -> 2. Vercel/Env Key -> 3. Empty
       const apiKey = customKey || import.meta.env.VITE_GOOGLE_API_KEY || ""; 
-      
       let success = false;
       
       if (referenceImage) {
-          // Multimodal Logic (Gemini Flash)
+          // Multimodal Logic
           const base64Data = referenceImage.split(',')[1];
           const mimeType = referenceImage.split(';')[0].split(':')[1];
 
@@ -194,7 +231,7 @@ export default function App() {
     if (generatedImage) {
       const link = document.createElement('a');
       link.href = generatedImage;
-      link.download = `pixar-style-${Date.now()}.png`;
+      link.download = `${selectedStyle.toLowerCase()}-art-${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -208,20 +245,47 @@ export default function App() {
           <div className="flex items-center justify-center gap-3 mb-2">
             <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse" />
             <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 drop-shadow-lg">
-              Pixar AI Studio
+              AI Art Studio
             </h1>
           </div>
           <p className="text-gray-300 text-sm md:text-base">
-            রেফারেন্স ছবি আপলোড করুন অথবা প্রম্পট দিয়ে ৯:১৬ রেশিওতে পিক্সার স্টাইলের ছবি তৈরি করুন।
+            Pixar 3D, Lo-Fi, বা Cozy স্টাইলে চমৎকার ছবি তৈরি করুন।
           </p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 md:p-8 shadow-2xl">
           <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between">
+            
+            {/* Control Row: Ratio, Upload, Style */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {/* Style Selector */}
                 <div className="flex-1">
                     <label className="block text-xs font-medium text-blue-200 uppercase tracking-wide mb-2 flex items-center gap-2">
-                        <Settings size={14} /> ছবির সাইজ (রেশিও)
+                        <Palette size={14} /> আর্ট স্টাইল
+                    </label>
+                    <div className="flex flex-col gap-2">
+                        {Object.keys(styles).map((styleKey) => (
+                            <button
+                                key={styleKey}
+                                onClick={() => setSelectedStyle(styleKey)}
+                                className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all text-left flex items-center justify-between ${
+                                    selectedStyle === styleKey 
+                                    ? 'bg-purple-600 text-white ring-2 ring-purple-300 shadow-lg' 
+                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
+                                }`}
+                            >
+                                <span>{styles[styleKey].label}</span>
+                                {selectedStyle === styleKey && <Sparkles size={14} />}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Aspect Ratio Selector */}
+                <div className="flex-1">
+                    <label className="block text-xs font-medium text-blue-200 uppercase tracking-wide mb-2 flex items-center gap-2">
+                        <Settings size={14} /> ছবির সাইজ
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                         {['9:16', '1:1', '16:9'].map((ratio) => (
@@ -240,22 +304,23 @@ export default function App() {
                     </div>
                 </div>
 
+                {/* Reference Image Uploader */}
                 <div className="flex-1">
                     <label className="block text-xs font-medium text-blue-200 uppercase tracking-wide mb-2 flex items-center gap-2">
-                        <Upload size={14} /> রেফারেন্স ছবি (ঐচ্ছিক)
+                        <Upload size={14} /> রেফারেন্স (ঐচ্ছিক)
                     </label>
                     {!referenceImage ? (
                         <div 
                             onClick={() => fileInputRef.current?.click()}
-                            className="border-2 border-dashed border-white/20 rounded-lg h-[42px] flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-white/5 transition-all text-gray-400 text-sm gap-2"
+                            className="border-2 border-dashed border-white/20 rounded-lg h-[42px] md:h-full flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-white/5 transition-all text-gray-400 text-sm gap-2 p-2"
                         >
-                            <ImageIcon size={16} /> ছবি আপলোড করুন
+                            <ImageIcon size={16} /> আপলোড
                         </div>
                     ) : (
-                        <div className="relative h-[42px] bg-black/40 rounded-lg flex items-center px-3 border border-purple-500/50">
+                        <div className="relative h-[42px] md:h-full bg-black/40 rounded-lg flex items-center px-3 border border-purple-500/50">
                             <span className="text-xs text-green-400 flex items-center gap-2 truncate flex-1">
                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                ছবি যুক্ত হয়েছে
+                                যুক্ত হয়েছে
                             </span>
                             <button onClick={clearReferenceImage} className="text-gray-400 hover:text-red-400 p-1">
                                 <X size={16} />
@@ -266,15 +331,16 @@ export default function App() {
                 </div>
             </div>
 
+            {/* Prompt Input */}
             <div>
                 <label className="block text-sm font-medium text-blue-200 uppercase tracking-wide mb-2">
-                  ছবির বর্ণনা (Prompt)
+                  ছবির বর্ণনা (Prompt) - {styles[selectedStyle].desc}
                 </label>
                 <div className="relative group">
                   <textarea
                     value={userPrompt}
                     onChange={(e) => setUserPrompt(e.target.value)}
-                    placeholder="উদাহরণ: একটি তোতা পাখি গাছের ডালে বসে আছে..."
+                    placeholder={`উদাহরণ: ${selectedStyle === 'Lo-Fi' ? 'একটি মেয়ে জানালার পাশে বসে বই পড়ছে, বৃষ্টি হচ্ছে...' : 'একটি কিউট বিড়াল স্পেস সুট পরে আছে...'}`}
                     rows={2}
                     className="w-full bg-black/40 border-2 border-white/10 text-white rounded-xl px-4 py-3 pr-12 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-500/20 transition-all placeholder-gray-500 text-lg resize-none"
                     onKeyDown={(e) => {
@@ -291,13 +357,14 @@ export default function App() {
                 </div>
             </div>
 
+            {/* API Key Input */}
             <div className={`transition-all duration-300 ${showKeyInput ? 'opacity-100 block' : 'opacity-0 h-0 overflow-hidden'}`}>
                 <label className="block text-xs text-red-300 mb-1">API Key প্রয়োজন (Get free from aistudio.google.com)</label>
                 <input
                     type="password"
                     value={customKey}
                     onChange={(e) => setCustomKey(e.target.value)}
-                    placeholder="এখানে আপনার API Key পেস্ট করুন (AIza...)"
+                    placeholder="API Key (AIza...)"
                     className="w-full bg-red-900/30 border border-red-500/50 text-white rounded-lg px-3 py-2 text-sm focus:border-red-400 focus:outline-none"
                 />
             </div>
@@ -314,7 +381,7 @@ export default function App() {
               {loading ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  তৈরি হচ্ছে...
+                  {selectedStyle} আর্ট তৈরি হচ্ছে...
                 </>
               ) : cooldown > 0 ? (
                 <>
@@ -363,7 +430,7 @@ export default function App() {
         </div>
 
         <div className="mt-8 text-center text-gray-500 text-sm">
-           Powered by Google Gemini & Imagen • Pixar Style AI
+           Powered by Google Gemini & Imagen • AI Art Studio
         </div>
       </div>
     </div>
