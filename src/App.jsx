@@ -20,6 +20,29 @@ export default function App() {
 
   // Expanded Style Definitions
   const styles = {
+    'Hyper Realistic': {
+      label: 'Hyper Realism',
+      desc: 'একদম বাস্তবের মতো (Ultra High Detail)',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Hyper-realistic photography, Photorealism, 8k UHD.
+      - Camera: DSLR, 85mm lens, f/1.8, high shutter speed.
+      - Lighting: Natural lighting, Ray tracing, Global illumination, Cinematic lighting.
+      - Details: Extremely detailed skin texture, pores, surfaces, imperfections, sharp focus.
+      - Vibe: National Geographic photography, Cinematic reality.
+      `
+    },
+    'Cinematic': {
+      label: 'Cinematic Movie',
+      desc: 'মুভির সিনের মতো',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Cinematic Movie Still, Hollywood Blockbuster style.
+      - Aspect: Wide dynamic range, color graded (teal and orange).
+      - Lighting: Dramatic lighting, rim light, volumetric fog, anamorphic lens flares.
+      - Render: Unreal Engine 5, Octane Render, 8k resolution.
+      `
+    },
     'Pixar': {
       label: 'Pixar 3D',
       desc: 'ডিজনি পিক্সার স্টাইল',
