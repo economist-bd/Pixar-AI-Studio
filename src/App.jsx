@@ -20,6 +20,30 @@ export default function App() {
 
   // Expanded Style Definitions
   const styles = {
+    'Book Cover': {
+      label: 'Book Cover',
+      desc: 'বইয়ের কভার ডিজাইন',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Professional Best-Seller Book Cover Design.
+      - Layout: Leave clear space for Title and Author Name at top or bottom.
+      - Typography Vibe: Elegant, Cinematic, Bold text layout (Note: AI may simulate text shapes).
+      - Visuals: High-concept imagery, symbolic, emotional connection to the prompt.
+      - Resolution: 8k, print-ready quality.
+      `
+    },
+    'Thumbnail': {
+      label: 'Thumbnail & Logo',
+      desc: 'আকর্ষণীয় থাম্বনেইল (ক্যালিগ্রাফি)',
+      instruction: `
+      MANDATORY ART STYLE:
+      - Style: Viral YouTube Thumbnail / Social Media Banner.
+      - Text Style: Calligraphy, Brush Stroke, or Big Bold 3D Text aesthetic.
+      - Vibe: High energy, Vibrant colors, High contrast, "Click-bait" appeal.
+      - Elements: Expressive faces, glowing outlines, arrows, dynamic composition.
+      - Logo: Place for branding/logo integration, clean modern look.
+      `
+    },
     'Hyper Realistic': {
       label: 'Hyper Realism',
       desc: 'একদম বাস্তবের মতো (Ultra High Detail)',
